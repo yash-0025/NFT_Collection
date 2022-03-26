@@ -2,21 +2,21 @@
 
 pragma solidity ^0.8.4;
 
-import "@openzepplin/contracts/token/ERC721/extensions/ERC721numerable.sol";
-import "@openzepplin/contracts/access/Ownable.sol";
-import "./IWhitelist";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./IWhitelist.sol";
 
-conract CryptoDevs is ERC721numerable, Ownable {
+contract CryptoDevs is ERC721Enumerable, Ownable {
 
     string _baseTokenURI;
     uint256 public _price = 0.01 ether;
 
     bool public _paused;
-    uint256 publix maxTokenIds= 20;
+    uint256 public maxTokenIds= 20;
     uint256 public tokenIds;
     IWhitelist whitelist;
 
-    bool publix presaleStarted;
+    bool public presaleStarted;
 
     uint256 public presaleEnded;
     modifier onlyWhenNotPaused {
@@ -24,7 +24,7 @@ conract CryptoDevs is ERC721numerable, Ownable {
         _;
     } 
 
-    constructor (string memory baseUrI, address whitelistContract) ERC721("Crypto Devs", "CD") {
+    constructor (string memory baseURI, address whitelistContract) ERC721("Crypto Devs", "CD") {
         _baseTokenURI = baseURI;
         whitelist = IWhitelist(whitelistContract);
     }
@@ -37,7 +37,7 @@ conract CryptoDevs is ERC721numerable, Ownable {
     function presaleMint() public payable onlyWhenNotPaused {
         require(presaleStarted && block.timestamp < presaleEnded, "Presale is not running.");
         require(whitelist.whitelistedAddresses(msg.sender), "You are not whitelisted");
-        require(tokenIds < maxtokenIds, "Exceeded maximum Crypto Dev supply");
+        require(tokenIds < maxTokenIds, "Exceeded maximum Crypto Dev supply");
         require(msg.value >= _price,"Ether sent is not correct");
         tokenIds += 1;
 
@@ -65,7 +65,7 @@ conract CryptoDevs is ERC721numerable, Ownable {
     function withdraw() public onlyOwner {
         address _owner = owner() ;
         uint256 amount =address(this).balance;
-        (bool sent,) = _owner.call{value: amount("")};
+        (bool sent,) = _owner.call{value: amount}("");
         require(sent, "Failed to send Ether");
     }
 
